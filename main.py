@@ -127,12 +127,15 @@ Just the raw command.
             )
 
             if shell_output.stdout:
-                print(f"STDOUT:\n{shell_output.stdout}")
+                print(f"{shell_output.stdout}")
             if shell_output.stderr:
-                print(f"STDERR:\n{shell_output.stderr}")
+                print(f"{shell_output.stderr}")
             print()
 
-            feedback = f"""{shell_output.stdout} {shell_output.stderr}"""
+            if shell_output.stderr:
+                feedback = shell_output.stderr
+            else:
+                feedback = shell_output.stdout
 
             command = conv.send(feedback)
             print(f"AI$> {command}\n")
