@@ -112,46 +112,35 @@ Just the raw command.
 
     conv = Conversation()
 
-    # Send initial prompt
-    print("=== Sending initial prompt to AI ===")
     command = conv.send(initial_prompt)
-    print(f"\nAI Command: {command}\n")
+    print(f"AI$> {command}\n")
 
     while True:
         try:
-            # Execute the command
             shell_output = subprocess.run(
                 command,
                 shell=True,
                 capture_output=True,
                 text=True,
-                check=False,  # Don't raise on error
-                timeout=30  # 30 second timeout
+                check=False,
+                timeout=30
             )
 
-            # Display output
-            print(f"--- Exit Code: {shell_output.returncode} ---")
             if shell_output.stdout:
                 print(f"STDOUT:\n{shell_output.stdout}")
             if shell_output.stderr:
                 print(f"STDERR:\n{shell_output.stderr}")
             print()
 
-            # Send output back to AI for next command
-            feedback = f"""Last command: {command}
-Exit code: {shell_output.returncode}
-STDOUT: {shell_output.stdout}
-STDERR: {shell_output.stderr}
-
-What's your next command? (respond with only the command, no explanations)"""
+            feedback = f"""{shell_output.stdout} {shell_output.stderr}"""
 
             command = conv.send(feedback)
-            print(f"AI Command: {command}\n")
+            print(f"AI$> {command}\n")
 
         except subprocess.TimeoutExpired:
             print(f"Command timed out after 30 seconds: {command}")
-            command = conv.send("Last command timed out. Try a different approach.")
-            print(f"AI Command: {command}\n")
+            command = conv.send("Command timed out.")
+            print(f"AI$> {command}\n")
 
         except KeyboardInterrupt:
             print("\n\nInterrupted by user. Exiting...")
@@ -159,6 +148,6 @@ What's your next command? (respond with only the command, no explanations)"""
 
         except Exception as e:
             print(f"Error: {e}")
-            command = conv.send(f"Error occurred: {e}. Try a different command.")
-            print(f"AI Command: {command}\n")
+            command = conv.send(f"{e}")
+            print(f"AI$> {command}\n")
 
